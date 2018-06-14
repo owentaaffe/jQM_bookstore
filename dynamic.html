@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>jQuery Mobile: Theme Download</title>
+	<link rel="stylesheet" href="themes/booklist.min.css" />
+    <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+	
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+    <link rel="stylesheet" href="assets/css/myStyle.css">
+</head>
+<body id="bookListView">
+	<div data-role="page" id="pageone" data-theme="b">
+    
+    <div data-role="panel" id="overlayPanel" data-display="overlay"> 
+      <h2>Book list</h2>
+      <p>This page is dynamically rendered by using an ajax call to books.xml. You will have to refresh the page to load the list. I have tried adding .listview('refresh'); to the page before/after page loads but are unable to get this working but will keep looking for a solution.</p>
+      <p>The books.xml has title, author, discription, genre, href for the page link and a url to an image in a folder.</p>
+      <p>The books are sorted alphabetically and appended to a lettered divider</p>
+      
+      <a href="dynamic.html" data-rel="close" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-a ui-icon-delete ui-btn-icon-left">Close panel</a>
+    </div> 
+   
+    <div data-role="header" id="" data-theme="b">
+      <a href="#overlayPanel" class="ui-btn ui-btn-left ui-corner-all ui-shadow ui-btn-icon-left ui-icon-bars">Panel</a>
+      <h2>Homepage</h2>
+      <a href="index.html" class="ui-btn ui-btn-right ui-btn-icon-right ui-corner-all ui-icon-arrow-r" data-theme="a">Booklist 1</a>
+    </div>
+
+    <div data-role="main" class="ui-content">
+      
+      <div data-filter="true" class="myFilter" data-inset="true" id="myFilter" data-input="#filterCollapsibles">
+        <ul data-role="listview" id="listView" data-filter="true" data-inset="true" data-autodividers="true" data-sort="true" data-divider-theme="a">
+		</ul>
+      </div>
+      
+    </div>
+
+    <div data-role="footer" data-position="fixed" id="footer" data-theme="d">
+    </div>
+  </div> 
+  
+  <script src="assets/js/jquery-1.11.1.min.js"></script>
+  <script src="assets/js/jquery.mobile-1.4.5.min.js"></script>
+  <script>
+	$(document).ready(function() {
+	  console.log('Starting...');
+	  $.ajax({
+		type: 'GET',
+        url: 'books.xml',
+        dataType: 'xml',
+        success: function(data) {
+		  $(data).find('bookList book').each(function() {
+		    var sTitle = $(this).find('title').text();
+			var sLink = $(this).find('href').text();
+			var sAuthor = $(this).find('author').text();
+			var sUrl = $(this).find('url').text();
+			var sDiscription = $(this).find('description').text();
+			var sGenre = $(this).attr('genre');
+			// append div with own id for the link to each page to the body 
+			$('body').append('<div data-role="page" id="' + sLink + '" data-position="fixed" data-theme="b"></div>');
+			// append data from the xml to the page
+			$('#' + sLink).append('<div data-role="header" id="headerDiv" data-theme="a"><h2>' + sGenre + '</h2><a href="#pageone" class="ui-btn ui-btn-right ui-corner-all ui-btn-icon-right ui-icon-arrow-r" data-theme="d">Back</a></div><div data-role="content" data-theme="b"><div data-demo-html="true" class=" left-content"><h3><b>Title: </b>' + sTitle + '</h3><h3><b>Author: </b>' + sAuthor + '</h3><p><b>Description: </b>' + sDiscription + '</p></div><div class="right-content"><img src="' + sUrl + '" alt=""></div>');
+			 
+			// append li with title and link to it's own page
+			$('.myFilter ul').append('<li><a href="#' + sLink + '"data-transition="turn" data-filtertext="' + sTitle + '">' + sTitle + '</a></li>').listview('refresh');
+			  
+		  });
+	    },
+		error: function() {
+			$('#bookListCollapsible h3').text('Something went wrong, please get in touch with the admin...')
+		}
+     }); 
+	});
+  </script>
+</body>
+</html>
